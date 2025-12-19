@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-notifications-v7';
+const CACHE_NAME = 'pwa-notifications-v8';
 const urlsToCache = [
   '/pwa-notifications/',
   '/pwa-notifications/index.html',
@@ -15,9 +15,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: Caching files');
-        return cache.addAll(urlsToCache.filter(url =>
-          !url.includes('icon-')
-        ));
+        return cache.addAll(urlsToCache);
       })
       .then(() => self.skipWaiting())
   );

@@ -15,10 +15,29 @@ function updateStatus(message, type = '') {
     statusEl.className = 'status ' + type;
 }
 
-function updateDebugInfo() {
+async function updateDebugInfo() {
     const info = [];
     info.push(`✓ Service Worker: ${('serviceWorker' in navigator) ? 'Supported' : 'Not supported'}`);
-    info.push(`✓ Manifest: ${document.querySelector('link[rel="manifest"]') ? 'Linked' : 'Not found'}`);
+
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) {
+        info.push(`✓ Manifest: Linked (${manifestLink.href})`);
+        try {
+            const response = await fetch(manifestLink.href);
+            if (response.ok) {
+                const manifest = await response.json();
+                info.push(`✓ Manifest loaded: name="${manifest.name}"`);
+                info.push(`✓ Icons: ${manifest.icons?.length || 0} defined`);
+            } else {
+                info.push(`❌ Manifest fetch failed: ${response.status}`);
+            }
+        } catch (e) {
+            info.push(`❌ Manifest parse error: ${e.message}`);
+        }
+    } else {
+        info.push(`❌ Manifest: Not linked`);
+    }
+
     info.push(`✓ HTTPS: ${location.protocol === 'https:' ? 'Yes' : 'No'}`);
     info.push(`⏱ Install prompt: ${deferredPrompt ? 'Ready' : 'Waiting...'}`);
 
