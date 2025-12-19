@@ -94,6 +94,12 @@ h1 {
     opacity: 0.6;
 }
 
+.btn-install {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-size: 18px;
+    font-weight: bold;
+}
+
 .info {
     background: #e3f2fd;
     padding: 20px;

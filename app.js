@@ -1,7 +1,9 @@
 let notificationInterval = null;
 let notificationCount = 0;
+let deferredPrompt = null;
 
 const statusEl = document.getElementById('status');
+const installBtn = document.getElementById('installButton');
 const enableBtn = document.getElementById('enableNotifications');
 const startBtn = document.getElementById('startNotifications');
 const stopBtn = document.getElementById('stopNotifications');
@@ -131,6 +133,44 @@ function stopNotifications() {
     updateStatus('Notifications stopped', '');
     addLogEntry('Stopped notification timer');
 }
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+    addLogEntry('Install prompt available - showing install button');
+    console.log('beforeinstallprompt event fired');
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+        addLogEntry('Install prompt not available');
+        return;
+    }
+
+    installBtn.style.display = 'none';
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+
+    if (outcome === 'accepted') {
+        addLogEntry('PWA installation accepted!');
+        updateStatus('App installed successfully!', 'success');
+    } else {
+        addLogEntry('PWA installation dismissed');
+        installBtn.style.display = 'block';
+    }
+
+    deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+    addLogEntry('PWA was installed successfully');
+    updateStatus('App installed! You can now use it offline.', 'success');
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+});
 
 enableBtn.addEventListener('click', requestNotificationPermission);
 startBtn.addEventListener('click', startNotifications);
