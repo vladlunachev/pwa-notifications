@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <title>PWA Notifications Demo</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>PWA Notifications Demo</h1>
+        <p class="status" id="status">Loading...</p>
+
+        <div class="controls">
+            <button id="enableNotifications" class="btn">Enable Notifications</button>
+            <button id="startNotifications" class="btn" disabled>Start Notifications (Every 10s)</button>
+            <button id="stopNotifications" class="btn" disabled>Stop Notifications</button>
+        </div>
+
+        <div class="info">
+            <h2>Instructions:</h2>
+            <ol>
+                <li>Click "Enable Notifications" to grant permission</li>
+                <li>Click "Start Notifications" to begin receiving notifications every 10 seconds</li>
+                <li>Install this app on your phone using the browser's "Add to Home Screen" option</li>
+            </ol>
+        </div>
+
+        <div class="log" id="log">
+            <h3>Notification Log:</h3>
+            <div id="logEntries"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
