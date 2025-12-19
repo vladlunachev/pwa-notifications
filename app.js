@@ -27,7 +27,9 @@ function addLogEntry(message) {
 async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.register('sw.js');
+            const registration = await navigator.serviceWorker.register('sw.js', {
+                scope: '/pwa-notifications/'
+            });
             console.log('Service Worker registered:', registration);
             addLogEntry('Service Worker registered successfully');
             updateStatus('Service Worker ready. Click "Enable Notifications" to continue.', 'success');
@@ -136,6 +138,16 @@ stopBtn.addEventListener('click', stopNotifications);
 
 window.addEventListener('load', async () => {
     try {
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                if (registration.scope !== location.origin + '/pwa-notifications/') {
+                    console.log('Unregistering old service worker:', registration.scope);
+                    await registration.unregister();
+                }
+            }
+        }
+
         await registerServiceWorker();
 
         if (Notification.permission === 'granted') {

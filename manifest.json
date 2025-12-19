@@ -2,7 +2,7 @@
   "name": "PWA Notifications Demo",
   "short_name": "PWA Notify",
   "description": "A simple PWA that demonstrates push notifications",
-  "start_url": "/pwa-notifications/",
+  "start_url": "/pwa-notifications/index.html",
   "scope": "/pwa-notifications/",
   "display": "standalone",
   "background_color": "#667eea",
