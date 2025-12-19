@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-notifications-v4';
+const CACHE_NAME = 'pwa-notifications-v5';
 const urlsToCache = [
   '/pwa-notifications/',
   '/pwa-notifications/index.html',
