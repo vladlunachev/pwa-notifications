@@ -1,12 +1,12 @@
-const CACHE_NAME = 'pwa-notifications-v1';
+const CACHE_NAME = 'pwa-notifications-v2';
 const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  '/pwa-notifications/',
+  '/pwa-notifications/index.html',
+  '/pwa-notifications/style.css',
+  '/pwa-notifications/app.js',
+  '/pwa-notifications/manifest.json',
+  '/pwa-notifications/icon-192.png',
+  '/pwa-notifications/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -58,7 +58,7 @@ self.addEventListener('fetch', event => {
           return response;
         });
       }).catch(() => {
-        return caches.match('./index.html');
+        return caches.match('/pwa-notifications/index.html');
       })
   );
 });
@@ -77,7 +77,7 @@ self.addEventListener('notificationclick', event => {
           }
         }
         if (clients.openWindow) {
-          return clients.openWindow('./');
+          return clients.openWindow('/pwa-notifications/');
         }
       })
   );
