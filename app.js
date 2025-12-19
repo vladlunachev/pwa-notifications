@@ -8,10 +8,25 @@ const enableBtn = document.getElementById('enableNotifications');
 const startBtn = document.getElementById('startNotifications');
 const stopBtn = document.getElementById('stopNotifications');
 const logEntriesEl = document.getElementById('logEntries');
+const debugInfoEl = document.getElementById('debugInfo');
 
 function updateStatus(message, type = '') {
     statusEl.textContent = message;
     statusEl.className = 'status ' + type;
+}
+
+function updateDebugInfo() {
+    const info = [];
+    info.push(`✓ Service Worker: ${('serviceWorker' in navigator) ? 'Supported' : 'Not supported'}`);
+    info.push(`✓ Manifest: ${document.querySelector('link[rel="manifest"]') ? 'Linked' : 'Not found'}`);
+    info.push(`✓ HTTPS: ${location.protocol === 'https:' ? 'Yes' : 'No'}`);
+    info.push(`⏱ Install prompt: ${deferredPrompt ? 'Ready' : 'Waiting...'}`);
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        info.push(`✓ Already installed as PWA`);
+    }
+
+    debugInfoEl.innerHTML = '<strong>Debug Info:</strong><br>' + info.join('<br>');
 }
 
 function addLogEntry(message) {
@@ -138,8 +153,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.style.display = 'block';
-    addLogEntry('Install prompt available - showing install button');
+    addLogEntry('✓ Install prompt available - showing install button');
     console.log('beforeinstallprompt event fired');
+    updateDebugInfo();
 });
 
 installBtn.addEventListener('click', async () => {
@@ -197,6 +213,15 @@ window.addEventListener('load', async () => {
         } else if (Notification.permission === 'denied') {
             updateStatus('Notification permission denied. Please enable in browser settings.', 'error');
         }
+
+        updateDebugInfo();
+        setInterval(updateDebugInfo, 2000);
+
+        setTimeout(() => {
+            if (!deferredPrompt) {
+                addLogEntry('⚠ Install prompt did not fire. Use browser menu to install.');
+            }
+        }, 5000);
     } catch (error) {
         updateStatus('Initialization failed: ' + error.message, 'error');
     }
