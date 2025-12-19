@@ -1,12 +1,12 @@
 const CACHE_NAME = 'pwa-notifications-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -58,7 +58,7 @@ self.addEventListener('fetch', event => {
           return response;
         });
       }).catch(() => {
-        return caches.match('/index.html');
+        return caches.match('./index.html');
       })
   );
 });
@@ -72,12 +72,12 @@ self.addEventListener('notificationclick', event => {
       .then(clientList => {
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
-          if (client.url === '/' && 'focus' in client) {
+          if ('focus' in client) {
             return client.focus();
           }
         }
         if (clients.openWindow) {
-          return clients.openWindow('/');
+          return clients.openWindow('./');
         }
       })
   );
