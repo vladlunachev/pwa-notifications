@@ -1,6 +1,11 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+import { firebaseConfig, vapidKey } from './firebase-config.js';
+
 let notificationInterval = null;
 let notificationCount = 0;
 let deferredPrompt = null;
+let fcmToken = null;
 
 const statusEl = document.getElementById('status');
 const installBtn = document.getElementById('installButton');
@@ -9,6 +14,10 @@ const startBtn = document.getElementById('startNotifications');
 const stopBtn = document.getElementById('stopNotifications');
 const logEntriesEl = document.getElementById('logEntries');
 const debugInfoEl = document.getElementById('debugInfo');
+const fcmTokenEl = document.getElementById('fcmToken');
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
 
 function updateStatus(message, type = '') {
     statusEl.textContent = message;
@@ -81,6 +90,56 @@ async function registerServiceWorker() {
     }
 }
 
+async function getFCMToken() {
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const token = await getToken(messaging, {
+            vapidKey: vapidKey,
+            serviceWorkerRegistration: registration
+        });
+
+        if (token) {
+            fcmToken = token;
+            console.log('FCM Token:', token);
+            addLogEntry('FCM Token obtained successfully');
+            if (fcmTokenEl) {
+                fcmTokenEl.textContent = token;
+                fcmTokenEl.style.display = 'block';
+            }
+            return token;
+        } else {
+            console.log('No registration token available');
+            addLogEntry('Failed to get FCM token');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting FCM token:', error);
+        addLogEntry('Error getting FCM token: ' + error.message);
+        return null;
+    }
+}
+
+function setupForegroundMessageHandler() {
+    onMessage(messaging, (payload) => {
+        console.log('Foreground message received:', payload);
+        addLogEntry('Push notification received (foreground)');
+
+        const notificationTitle = payload.notification?.title || 'New Message';
+        const notificationOptions = {
+            body: payload.notification?.body || 'You have a new notification',
+            icon: payload.notification?.icon || 'icon-192.png',
+            badge: 'icon-192.png',
+            data: payload.data
+        };
+
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(notificationTitle, notificationOptions);
+            });
+        }
+    });
+}
+
 async function requestNotificationPermission() {
     if (!('Notification' in window)) {
         updateStatus('Notifications not supported', 'error');
@@ -91,8 +150,12 @@ async function requestNotificationPermission() {
     try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-            updateStatus('Notification permission granted!', 'success');
+            updateStatus('Notification permission granted! Getting FCM token...', 'success');
             addLogEntry('Notification permission granted');
+
+            await getFCMToken();
+            setupForegroundMessageHandler();
+
             startBtn.disabled = false;
             enableBtn.disabled = true;
             return true;

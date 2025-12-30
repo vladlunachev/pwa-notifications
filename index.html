@@ -31,10 +31,17 @@
             <ol>
                 <li>Click "📱 Install App" button if it appears (Chrome/Edge only)</li>
                 <li>Or use browser menu (⋮) → "Install app" or "Add to Home Screen"</li>
-                <li>Click "Enable Notifications" to grant permission</li>
-                <li>Click "Start Notifications" to begin receiving notifications every 10 seconds</li>
+                <li>Click "Enable Notifications" to grant permission and get FCM token</li>
+                <li>Copy the FCM token below to use with the server</li>
+                <li>Click "Start Notifications" to test local notifications</li>
             </ol>
             <div id="debugInfo" style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 5px; font-size: 12px;"></div>
+
+            <div id="fcmTokenContainer" style="margin-top: 15px; padding: 10px; background: #d1ecf1; border-radius: 5px;">
+                <h3 style="margin-top: 0;">FCM Token (Device ID):</h3>
+                <div id="fcmToken" style="word-break: break-all; font-family: monospace; font-size: 11px; background: white; padding: 8px; border-radius: 3px; display: none;"></div>
+                <p style="font-size: 12px; margin: 8px 0 0 0; color: #0c5460;">Copy this token to send push notifications from the server!</p>
+            </div>
         </div>
 
         <div class="log" id="log">
@@ -43,6 +50,6 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

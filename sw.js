@@ -1,9 +1,13 @@
-const CACHE_NAME = 'pwa-notifications-v9';
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+const CACHE_NAME = 'pwa-notifications-v10';
 const urlsToCache = [
   '/pwa-notifications/',
   '/pwa-notifications/index.html',
   '/pwa-notifications/style.css',
   '/pwa-notifications/app.js',
+  '/pwa-notifications/firebase-config.js',
   '/pwa-notifications/manifest.json',
   '/pwa-notifications/icon-192.png',
   '/pwa-notifications/icon-512.png'
@@ -83,4 +87,49 @@ self.addEventListener('notificationclick', event => {
 
 self.addEventListener('notificationclose', event => {
   console.log('Notification closed:', event.notification.tag);
+});
+
+self.addEventListener('push', event => {
+  console.log('Push event received:', event);
+
+  let notificationData = {
+    title: 'New Notification',
+    body: 'You have a new message',
+    icon: '/pwa-notifications/icon-192.png',
+    badge: '/pwa-notifications/icon-192.png'
+  };
+
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      console.log('Push notification data:', data);
+
+      if (data.notification) {
+        notificationData = {
+          title: data.notification.title || notificationData.title,
+          body: data.notification.body || notificationData.body,
+          icon: data.notification.icon || notificationData.icon,
+          badge: data.notification.badge || notificationData.badge,
+          data: data.data || {}
+        };
+      }
+    } catch (e) {
+      console.log('Push event data is not JSON:', event.data.text());
+      notificationData.body = event.data.text();
+    }
+  }
+
+  const promiseChain = self.registration.showNotification(
+    notificationData.title,
+    {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      data: notificationData.data,
+      vibrate: [200, 100, 200],
+      tag: 'fcm-notification'
+    }
+  );
+
+  event.waitUntil(promiseChain);
 });
