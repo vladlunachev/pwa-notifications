@@ -4,8 +4,7 @@ node_modules/
 *.py
 push_notifs_plan.md
 
-# Firebase credentials
-firebase-config.js
+# Firebase server credentials (NEVER commit these!)
 firebase-service-account.json
 .env
 
